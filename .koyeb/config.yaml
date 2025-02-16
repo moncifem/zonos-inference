@@ -1,9 +1,0 @@
-build:
-  dockerfile: ./Dockerfile
-  location: ./
-service:
-  ports:
-    - port: 8000
-      protocol: http
-  resources:
-    gpu: true 

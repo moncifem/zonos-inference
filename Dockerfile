@@ -1,29 +1,27 @@
-FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
+FROM ubuntu:22.04
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    espeak-ng \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Add conda to PATH
-ENV PATH /opt/conda/bin:$PATH
+# Install uv
+RUN pip install -U uv
 
-RUN apt update && \
-    apt install -y espeak-ng git && \
-    rm -rf /var/lib/apt/lists/*
+# Copy application files
+COPY requirements.txt app.py ./
 
-RUN git clone --depth 1 https://github.com/Zyphra/Zonos.git /Zonos
+# Install Python dependencies using uv
+RUN uv pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Install Zonos
+RUN uv pip install -e .
 
-RUN pip install -r requirements.txt && \
-    cd /Zonos && \
-    pip install -e .
-
-ENV PYTHONPATH=/app
-
+# Expose the FastAPI port
 EXPOSE 8000
 
-# Create entrypoint script
-RUN echo '#!/bin/bash\npython main.py' > /entrypoint.sh && \
-    chmod +x /entrypoint.sh
-
-# Use the entrypoint script
-CMD ["/entrypoint.sh"] 
+# Run the FastAPI application
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"] 
