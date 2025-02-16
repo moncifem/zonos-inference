@@ -4,7 +4,7 @@ services:
     build: 
       context: .
       cache_from:
-        - pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
+        - pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
     platform: linux/amd64
     ports:
       - "8000:8000"
