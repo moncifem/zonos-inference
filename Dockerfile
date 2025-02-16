@@ -1,30 +1,32 @@
-FROM ubuntu:22.04
+# Use CUDA base image
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+
+# Set working directory
+WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     python3-pip \
-    python3-venv \
-    espeak-ng \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 
-# Install uv
-RUN pip install -U uv
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Create virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Install additional dependencies
+RUN pip3 install git+https://github.com/Zyphra/Zonos.git
 
-# Copy application files
-COPY requirements.txt app.py ./
+# Copy the rest of the application
+COPY . .
 
-# Install Python dependencies using uv
-RUN uv venv && \
-    uv pip install --no-cache-dir -r requirements.txt
+# Create upload directory
+RUN mkdir -p /tmp/uploads && chmod 777 /tmp/uploads
 
-# Expose the FastAPI port
-EXPOSE 8000
+# Expose port
+EXPOSE 5000
 
-# Run the FastAPI application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Start the application with gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "120", "app:app"] 

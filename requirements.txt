@@ -1,6 +1,5 @@
-fastapi
-uvicorn
-python-multipart
-torch
-torchaudio
-zonos 
+flask==2.3.3
+torch==2.1.0
+torchaudio==2.1.0
+werkzeug==2.3.7
+gunicorn==21.2.0 
