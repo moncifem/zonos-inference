@@ -23,9 +23,6 @@ COPY requirements.txt app.py ./
 RUN uv venv && \
     uv pip install --no-cache-dir -r requirements.txt
 
-# Install Zonos
-RUN uv pip install -e .
-
 # Expose the FastAPI port
 EXPOSE 8000
 
