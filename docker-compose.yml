@@ -1,0 +1,19 @@
+version: '3'
+services:
+  zonos-api:
+    build: 
+      context: .
+      cache_from:
+        - pytorch/pytorch:2.0.0-cuda11.7-cudnn8-runtime
+    platform: linux/amd64
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: >
+      sh -c "mkdir -p /app/assets/examples && python -m app.main" 
