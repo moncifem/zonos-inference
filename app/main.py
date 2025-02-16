@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from services.audio_service import AudioService
+from app.services.audio_service import AudioService
 import os
 
 app = FastAPI(title="Zonos TTS API")

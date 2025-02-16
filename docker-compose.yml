@@ -15,5 +15,7 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    environment:
+      - PYTHONPATH=/app
     command: >
       sh -c "mkdir -p /app/assets/examples && python -m app.main" 
