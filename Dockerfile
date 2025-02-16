@@ -1,29 +1,29 @@
 FROM pytorch/pytorch:2.6.0-cuda12.4-cudnn9-devel
 
-RUN pip install uv
+WORKDIR /app
+
+# Add conda to PATH
+ENV PATH /opt/conda/bin:$PATH
 
 RUN apt update && \
     apt install -y espeak-ng git && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
-
-# Clone Zonos repository
 RUN git clone --depth 1 https://github.com/Zyphra/Zonos.git /Zonos
 
-# Copy our application files
 COPY . .
 
-# Install dependencies and Zonos
-RUN cd /Zonos && \
-    uv pip install --system -e . && \
-    uv pip install --system -e .[compile] && \
-    uv pip install --system -r /app/requirements.txt
+RUN pip install -r requirements.txt && \
+    cd /Zonos && \
+    pip install -e .
 
-# Make sure Python can find our app module
 ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
-# Use absolute path to python
-CMD ["/opt/conda/bin/python", "-m", "app.main"] 
+# Create entrypoint script
+RUN echo '#!/bin/bash\npython main.py' > /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
+# Use the entrypoint script
+CMD ["/entrypoint.sh"] 
